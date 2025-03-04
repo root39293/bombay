@@ -1,61 +1,84 @@
 #chromadb_example.py
-from bombay.pipeline import create_pipeline, run_pipeline
+from bombay.pipeline import create_pipeline
 from dotenv import load_dotenv
 import os
 
+# 환경 변수 로드
 load_dotenv()
-
-# OpenAI API 키 설정
 api_key = os.getenv("OPENAI_API_KEY")
 
-# Bombay 파이프라인 생성 (온메모리)
-pipeline_inmemory = create_pipeline(
-    embedding_model_name='openai',
-    query_model_name='gpt-3',
+# 파이프라인 생성 (ChromaDB 사용)
+pipeline = create_pipeline(
+    embedding_model_name='openai',  # 자동으로 최신 임베딩 모델 사용
+    query_model_name='gpt-3',       # 자동으로 최신 GPT 모델 사용
     vector_db='chromadb',
     api_key=api_key,
-    similarity='cosine',
-    use_persistent_storage=False
+    use_persistent_storage=True,    # 데이터 영구 저장
+    collection_name='example_collection'
 )
 
-# Bombay 파이프라인 생성 (영구 저장)
-pipeline_persistent = run_pipeline(
-    embedding_model_name='openai',
-    query_model_name='gpt-3',
-    vector_db='chromadb',
-    api_key=api_key,
-    similarity='cosine',
-    use_persistent_storage=True
-)
+# 사용자 정의 프롬프트 템플릿 설정
+pipeline.set_prompt_template("""
+다음 문서를 참고하여 질문에 정확하게 답변해주세요.
 
-# 문서 추가 (온메모리)
+문서:
+{relevant_docs}
+
+질문: {query}
+
+답변:
+""")
+
+# 문서 추가 방법 1: 직접 문서 추가
 documents = [
-    "고양이는 앞발에 5개, 뒷발에 4개의 발가락이 있습니다.",
-    "고양이는 수면 시간이 많아 하루 평균 15~20시간을 잡니다.",
-    "고양이는 점프력이 뛰어나 자신의 몸길이의 최대 6배까지 뛰어오를 수 있습니다."
+    "고양이는 포유류에 속하는 동물입니다.",
+    "고양이는 약 6,000년 전부터 인간과 함께 살아온 것으로 추정됩니다.",
+    "고양이는 예민한 청각과 후각을 가지고 있어 작은 움직임이나 냄새도 쉽게 감지할 수 있습니다."
 ]
-pipeline_inmemory.add_documents(documents)
 
-# 문서 추가 (영구 저장)
-pipeline_persistent.add_documents(documents)
+# 메타데이터와 함께 문서 추가
+metadatas = [
+    {"source": "위키백과", "category": "동물", "topic": "고양이 특성"},
+    {"source": "위키백과", "category": "역사", "topic": "고양이 역사"},
+    {"source": "동물백과", "category": "동물", "topic": "고양이 특성"}
+]
 
-# 검색 및 질의 응답 (온메모리)
-query = "고양이의 수면 시간은 어떻게 되나요?"
-result_inmemory = run_pipeline(pipeline_inmemory, documents, query, k=1)
+pipeline.add_documents(documents, metadatas)
 
-# 검색 및 질의 응답 (영구 저장)
-result_persistent = run_pipeline(pipeline_persistent, documents, query, k=1)
+# 문서 추가 방법 2: 파일에서 문서 추가 (파일이 존재한다고 가정)
+# pipeline.process_file(
+#     "example/cat_facts.pdf",
+#     chunking_strategy="paragraph",
+#     chunk_size=500,
+#     chunk_overlap=100
+# )
 
-# 결과 출력 (온메모리)
-print("In-Memory Results:")
-print(f"Query: {result_inmemory['query']}")
-print(f"Relevant Documents: {result_inmemory['relevant_docs']}")
-print(f"Distances: {result_inmemory['distances']}")
-print(f"Answer: {result_inmemory['answer']}")
+# 질의 응답 (기본)
+query = "고양이는 어떤 동물인가요?"
+result = pipeline.search_and_answer(query, k=2)
 
-# 결과 출력 (영구 저장)
-print("\nPersistent Storage Results:")
-print(f"Query: {result_persistent['query']}")
-print(f"Relevant Documents: {result_persistent['relevant_docs']}")
-print(f"Distances: {result_persistent['distances']}")
-print(f"Answer: {result_persistent['answer']}")
+print("\n기본 검색 결과:")
+print(f"질문: {result['query']}")
+print(f"관련 문서: {result['relevant_docs']}")
+print(f"답변: {result['answer']}")
+
+# 필터링을 사용한 질의 응답
+query = "고양이의 역사에 대해 알려주세요."
+result = pipeline.search_and_answer(
+    query, 
+    k=1,
+    filter_criteria={"category": "역사"}
+)
+
+print("\n필터링 검색 결과:")
+print(f"질문: {result['query']}")
+print(f"관련 문서: {result['relevant_docs']}")
+print(f"답변: {result['answer']}")
+
+# 사용 가능한 임베딩 모델 확인
+available_models = pipeline.embedding_model.get_available_models()
+print(f"\n사용 가능한 임베딩 모델: {available_models}")
+
+# 사용 가능한 질의 모델 확인
+available_models = pipeline.query_model.get_available_models()
+print(f"\n사용 가능한 질의 모델: {available_models}")
