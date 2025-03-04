@@ -1,6 +1,6 @@
 # Bombay
 
-Bombay는 RAG(Retrieval-Augmented Generation) 파이프라인을 쉽게 구축할 수 있는 Python 라이브러리입니다. 다양한 임베딩 모델, 질의 모델, 벡터 데이터베이스를 지원하며 문서 처리 기능을 제공합니다.
+Bombay는 RAG(Retrieval-Augmented Generation) 파이프라인 구축용 Python 라이브러리. 다양한 임베딩 모델, 질의 모델, 벡터 데이터베이스 지원 및 문서 처리 기능 제공.
 
 ## 설치
 
@@ -10,11 +10,11 @@ pip install bombay
 
 ## 주요 기능
 
-- **자동 모델 관리**: OpenAI API 모델을 자동으로 관리하고 최신 모델 사용
+- **자동 모델 관리**: OpenAI API 모델 자동 관리 및 최신 모델 사용
 - **다양한 벡터 데이터베이스**: HNSWLib, ChromaDB, Pinecone, pgvector 등 지원
 - **문서 처리**: PDF, Word, Markdown, HTML 등 다양한 형식의 문서 처리
 - **청크 분할 전략**: 단순, 단락, 문장, 의미 기반 등 다양한 청크 분할 전략 제공
-- **플러그인 시스템**: 새로운 벡터 데이터베이스, 임베딩 모델, 문서 로더 등을 쉽게 추가 가능
+- **플러그인 시스템**: 새로운 벡터 데이터베이스, 임베딩 모델, 문서 로더 등 쉬운 추가 가능
 
 ## 기본 사용법
 
@@ -174,10 +174,10 @@ pipeline = create_pipeline(
 
 ## 예제
 
-더 많은 예제는 `example/` 디렉토리에서 확인할 수 있습니다:
+더 많은 예제는 `example/` 디렉토리에서 확인 가능:
 
-- `chromadb_example.py`: ChromaDB를 사용한 기본 예제
-- `hnswlib_example.py`: HNSWLib를 사용한 기본 예제
+- `chromadb_example.py`: ChromaDB 사용 기본 예제
+- `hnswlib_example.py`: HNSWLib 사용 기본 예제
 - `document_processing_example.py`: 문서 처리 및 청크 분할 예제
 - `vector_db_plugins_example.py`: 다양한 벡터 데이터베이스 플러그인 사용 예제
 
