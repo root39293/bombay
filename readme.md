@@ -1,6 +1,7 @@
 # Bombay
 
-Bombay는 RAG(Retrieval-Augmented Generation) 파이프라인 구축용 Python 라이브러리. 다양한 임베딩 모델, 질의 모델, 벡터 데이터베이스 지원 및 문서 처리 기능 제공.
+RAG(Retrieval-Augmented Generation) 구축을 위한 Python 라이브러리. 
+다양한 임베딩 모델, 질의 모델, 벡터 데이터베이스 지원 및 문서 처리 기능 제공.
 
 ## 설치
 
